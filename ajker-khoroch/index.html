@@ -128,6 +128,7 @@ li.payee select{flex:0 1 46%;font-size:.85rem;padding:6px 8px}
 .gets ul{display:block;padding-left:18px;margin:4px 0 0} .gets li{display:list-item;border:0;padding:2px 0}
 .onb small.en,.gets small.en{display:block;color:var(--muted);font-size:.86rem;font-weight:400;line-height:1.45;margin-top:2px;font-family:var(--f-body)}
 .en-inline{color:var(--muted);font-weight:400;font-size:.9rem}
+.sharebtn{background:var(--go);color:var(--card);text-decoration:none;font-weight:600}
 .helpbtn{font-size:.9rem;padding:6px 12px;border-radius:999px;background:var(--accent-soft);border-color:transparent}
 .fbq{display:flex;flex-direction:column;gap:4px;font-size:.95rem;color:var(--ink);flex:none}
 textarea{font:inherit;font-size:.85rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%;min-height:90px;resize:vertical}
@@ -142,6 +143,7 @@ textarea{font:inherit;font-size:.85rem;color:var(--ink);background:var(--bg);bor
     <h1>আজকের খরচ</h1>
     <span class="date" id="today"></span>
     <button class="helpbtn" id="obOpen">কীভাবে ব্যবহার করবেন? · How to use</button>
+    <a class="helpbtn sharebtn" id="shareApp" href="https://wa.me/?text=%E0%A6%86%E0%A6%9C%E0%A6%95%E0%A7%87%E0%A6%B0%20%E0%A6%96%E0%A6%B0%E0%A6%9A%20%E0%A6%85%E0%A7%8D%E0%A6%AF%E0%A6%BE%E0%A6%AA%3A%20%E0%A6%B0%E0%A7%8B%E0%A6%9C%20%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A7%81%E0%A6%A8%20%E0%A6%86%E0%A6%9C%20%E0%A6%95%E0%A6%A4%20%E0%A6%9F%E0%A6%BE%E0%A6%95%E0%A6%BE%20%E0%A6%A8%E0%A6%BF%E0%A6%B6%E0%A7%8D%E0%A6%9A%E0%A6%BF%E0%A6%A8%E0%A7%8D%E0%A6%A4%E0%A7%87%20%E0%A6%96%E0%A6%B0%E0%A6%9A%20%E0%A6%95%E0%A6%B0%E0%A6%BE%20%E0%A6%AF%E0%A6%BE%E0%A6%AF%E0%A6%BC%E0%A5%A4%20%E0%A6%B2%E0%A6%97%E0%A6%87%E0%A6%A8%20%E0%A6%A8%E0%A7%87%E0%A6%87%2C%20%E0%A6%B8%E0%A6%AC%20%E0%A6%A4%E0%A6%A5%E0%A7%8D%E0%A6%AF%20%E0%A6%B6%E0%A7%81%E0%A6%A7%E0%A7%81%20%E0%A6%86%E0%A6%AA%E0%A6%A8%E0%A6%BE%E0%A6%B0%20%E0%A6%AB%E0%A7%8B%E0%A6%A8%E0%A7%87%E0%A5%A4%20https%3A%2F%2Fpappa6.github.io%2Fajker-khoroch%2F" target="_blank" rel="noopener">বন্ধুকে পাঠান · Share</a>
   </header>
 
   <section class="onb" id="onboard" hidden>
@@ -667,6 +669,14 @@ $("bkYes").onclick=()=>{
     save();render();$("bkIn").value="";$("bkMsg").textContent=`ফিরিয়ে আনা হলো: ${bn(S.exp.length)}টা খরচ।`;
   }catch(_){$("bkMsg").textContent="এই লেখাটা ব্যাকআপ হিসেবে চেনা গেল না। পুরো লেখাটা কপি হয়েছে কিনা দেখুন।";}
 };
+
+/* ---------- share the app ---------- */
+$("shareApp").addEventListener("click",async e=>{
+  if(!navigator.share) return;
+  e.preventDefault();
+  try{await navigator.share({title:"আজকের খরচ",text:"আজকের খরচ অ্যাপ: রোজ জানুন আজ কত টাকা নিশ্চিন্তে খরচ করা যায়। লগইন নেই, সব তথ্য শুধু আপনার ফোনে।",url:"https://pappa6.github.io/ajker-khoroch/"});}
+  catch(err){ if(err&&err.name!=="AbortError") window.location.href=$("shareApp").href; }
+});
 
 /* ---------- first-run guide ---------- */
 const OB_KEY="ajkerKhoroch.onboarded";
