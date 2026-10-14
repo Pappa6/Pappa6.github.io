@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1f5f5b">
 <meta name="description" content="আজকের খরচ: রোজ জানুন আজ কত টাকা নিশ্চিন্তে খরচ করা যায়। বাংলায়, লগইন ছাড়া, সব তথ্য শুধু আপনার ফোনে। Ajker Khoroch: know how much you can safely spend today. No login, data stays on your phone.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>আজকের খরচ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -142,6 +145,8 @@ li.payee select{flex:0 1 46%;font-size:.85rem;padding:6px 8px}
 .fchain li::after{content:"↓";position:absolute;left:50%;bottom:-25px;transform:translateX(-50%);color:var(--accent);font-weight:700;font-size:1.2rem;line-height:24px}
 .fchain:last-of-type li:last-child{margin-bottom:0;background:var(--go-bg);border-color:var(--go)}
 .fchain:last-of-type li:last-child::after{display:none}
+.sharetip{background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.sharetip p{margin:0;font-size:.93rem}
 textarea{font:inherit;font-size:.85rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%;min-height:90px;resize:vertical}
 @media (prefers-reduced-motion:reduce){.meter span{transition:none}}
 </style>
@@ -229,6 +234,12 @@ textarea{font:inherit;font-size:.85rem;color:var(--ink);background:var(--bg);bor
         <li><span data-en="Pick the file from Downloads. If it asks for a password, type it and tap Open.">Downloads থেকে ফাইলটা বাছুন। পাসওয়ার্ড চাইলে লিখে <b>খুলুন</b> চাপুন।</span></li>
         <li class=done><span data-en="Tap Add to my budget. All your UPI payments are in ✅"><b>হিসেবে যোগ করুন</b> চাপুন। সব UPI খরচ বসে গেল ✅</span></li>
       </ol>
+      <div class="sharetip" id="shareTip" hidden>
+        <strong><span data-en="⚡ The easiest way">⚡ সবচেয়ে সহজ উপায়</span></strong>
+        <p><span data-en="Install the app on your phone once. Then open the statement PDF in PhonePe or email, tap Share → pick Ajker Khoroch from the list → the file comes straight here.">অ্যাপটা একবার ফোনে বসিয়ে নিন। তারপর PhonePe বা ইমেলে স্টেটমেন্টের PDF খুলে <b>Share</b> চাপুন → তালিকা থেকে <b>আজকের খরচ</b> বেছে নিন → ফাইল সোজা এখানে চলে আসবে।</span></p>
+        <button class="primary" id="installBtn" hidden><span data-en="Install the app">অ্যাপটা ফোনে বসান</span></button>
+        <p class="note" id="installHint"><span data-en="To install: tap ⋮ at the top right of Chrome → Install app or Add to Home screen.">বসাতে: Chrome-এর উপরে ডানদিকে ⋮ চাপুন → <b>Install app</b> বা <b>Add to Home screen</b>।</span></p>
+      </div>
       <p class="note"><span data-en="No copy-paste needed, you just pick the file. Next month, add the new statement the same way. Payments already added are not added twice.">কোনো কপি-পেস্ট লাগবে না, ফাইলটা শুধু বেছে নিতে হবে। পরের মাসে একই ভাবে নতুন স্টেটমেন্ট দিন, আগের খরচ দ্বিতীয়বার বসবে না।</span></p>
     </details>
     <label class="file" for="stmt"><span data-en="Choose statement file">স্টেটমেন্ট ফাইল বেছে নিন</span>
@@ -907,6 +918,7 @@ function showPreview(){
 }
 
 function planImport(rows){
+  if(S.sample) return {add:rows.slice(),dup:0,replace:[]};
   const ex={};S.exp.filter(e=>e.src==="imp").forEach(e=>{const k=e.d+"|"+e.a;ex[k]=(ex[k]||0)+1});
   const pool=S.exp.filter(e=>e.src!=="imp"&&e.tag!=="নগদ");
   const out={add:[],dup:0,replace:[]};
@@ -973,6 +985,34 @@ document.querySelectorAll("#howFlow [data-src]").forEach(b=>b.onclick=()=>{
   $("fc-pp").hidden=b.dataset.src!=="pp";$("fc-bank").hidden=b.dataset.src!=="bank";});
 $("howFlow").open=!S.exp.some(e=>e.src==="imp")||S.sample;
 
+/* ---------- install & receive shared statements (only on the real website) ---------- */
+const ON_SITE=location.hostname.endsWith("github.io");
+$("shareTip").hidden=!ON_SITE;
+if(ON_SITE&&"serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}
+let deferredInstall=null;
+const isInstalled=()=>window.matchMedia("(display-mode: standalone)").matches;
+if(isInstalled()) $("installHint").hidden=true;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;$("installBtn").hidden=false;$("installHint").hidden=true;});
+$("installBtn").onclick=async()=>{if(!deferredInstall)return;deferredInstall.prompt();try{await deferredInstall.userChoice}catch(_){};deferredInstall=null;$("installBtn").hidden=true;};
+window.addEventListener("appinstalled",()=>{$("installBtn").hidden=true;$("installHint").hidden=true;});
+async function takeShared(){
+  if(!/[?&]shared=1/.test(location.search)||!("caches" in window))return;
+  history.replaceState(null,"",location.pathname);
+  try{
+    const c=await caches.open("ajker-khoroch-share");
+    const r=await c.match("shared-statement");
+    if(!r){msg(T("শেয়ার করা ফাইল পাওয়া গেল না। আবার Share করে দেখুন।","The shared file did not arrive. Please share it again."),"err");return}
+    const blob=await r.blob();
+    const name=decodeURIComponent(r.headers.get("X-File-Name")||"statement");
+    await c.delete("shared-statement");
+    const file=new File([blob],name,{type:blob.type});
+    obMark();$("onboard").hidden=true;$("howFlow").open=false;
+    pendingFile=file;$("pw").value="";$("pwRow").hidden=true;
+    document.querySelector("section.import").scrollIntoView({behavior:"smooth",block:"start"});
+    readFile(file);
+  }catch(_){msg(T("শেয়ার করা ফাইল খোলা গেল না। \"স্টেটমেন্ট ফাইল বেছে নিন\" থেকে বেছে দেখুন।","Could not open the shared file. Try picking it with \"Choose statement file\"."),"err");}
+}
+
 /* ---------- language ---------- */
 const APP_URL="https://pappa6.github.io/ajker-khoroch/";
 function shareText(){return T("আজকের খরচ অ্যাপ: রোজ জানুন আজ কত টাকা নিশ্চিন্তে খরচ করা যায়। লগইন নেই, সব তথ্য শুধু আপনার ফোনে।","Ajker Khoroch app: know every day how much you can safely spend today. No login, all your data stays on your phone.");}
@@ -1002,6 +1042,7 @@ $("langBtn").onclick=()=>{
 };
 applyLang();
 render();
+takeShared();
 </script>
 
 </body>
