@@ -132,6 +132,16 @@ li.payee select{flex:0 1 46%;font-size:.85rem;padding:6px 8px}
 #langBtn{font-weight:600;border:1px solid var(--accent);background:var(--card);color:var(--accent)}
 .helpbtn{font-size:.9rem;padding:6px 12px;border-radius:999px;background:var(--accent-soft);border-color:transparent}
 .fbq{display:flex;flex-direction:column;gap:4px;font-size:.95rem;color:var(--ink);flex:none}
+.flowbox{background:var(--bg);border-radius:14px;padding:12px 14px;counter-reset:fs}
+.flowbox summary{font-size:1rem;color:var(--accent)}
+.flowbox .chips{margin-bottom:10px}
+.fchain{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.fchain li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:center;border:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--card);border-radius:12px;padding:9px 12px;font-size:.95rem;position:relative;margin-bottom:26px}
+.fchain li::before{counter-increment:fs;content:counter(fs);width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--card);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem}
+:root[lang="bn"] .fchain li::before{content:counter(fs,bengali)}
+.fchain li::after{content:"↓";position:absolute;left:50%;bottom:-25px;transform:translateX(-50%);color:var(--accent);font-weight:700;font-size:1.2rem;line-height:24px}
+.fchain:last-of-type li:last-child{margin-bottom:0;background:var(--go-bg);border-color:var(--go)}
+.fchain:last-of-type li:last-child::after{display:none}
 textarea{font:inherit;font-size:.85rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%;min-height:90px;resize:vertical}
 @media (prefers-reduced-motion:reduce){.meter span{transition:none}}
 </style>
@@ -195,6 +205,32 @@ textarea{font:inherit;font-size:.85rem;color:var(--ink);background:var(--bg);bor
   <section class="import">
     <h2><span data-en="Import UPI spending from a statement">স্টেটমেন্ট থেকে UPI খরচ আনুন</span></h2>
     <p class="note" id="importStatus">ব্যাঙ্ক বা PhonePe-র স্টেটমেন্ট দিলে সব UPI খরচ নিজে থেকেই ঢুকে যাবে।</p>
+    <details class="flowbox" id="howFlow" open>
+      <summary><span data-en="How to bring your statement here">স্টেটমেন্ট এখানে কীভাবে আনবেন</span></summary>
+      <div class="chips" role="group" aria-label="Statement source">
+        <button class="chip" data-src="pp" aria-pressed="true">PhonePe</button>
+        <button class="chip" data-src="bank" aria-pressed="false"><span data-en="Bank">ব্যাঙ্ক</span></button>
+      </div>
+      <ol class="fchain" id="fc-pp">
+        <li><span data-en="Open PhonePe and tap History">PhonePe অ্যাপ খুলে নিচে <b>History</b>-তে চাপুন</span></li>
+        <li><span data-en="Tap Download Statement at the top">উপরে <b>Download Statement</b> চিহ্নে চাপুন</span></li>
+        <li><span data-en="Choose the months and tap Proceed">মাস বেছে নিয়ে <b>Proceed</b> চাপুন</span></li>
+        <li><span data-en="The statement PDF arrives in your email">স্টেটমেন্টের PDF আপনার <b>ইমেলে</b> আসবে</span></li>
+      </ol>
+      <ol class="fchain" id="fc-bank" hidden>
+        <li><span data-en="Open your bank app or net banking (e.g. SBI YONO)">ব্যাঙ্কের অ্যাপ বা নেট ব্যাঙ্কিং খুলুন (যেমন SBI YONO)</span></li>
+        <li><span data-en="Go to Account Statement or e-Statement"><b>Account Statement</b> বা <b>e-Statement</b>-এ যান</span></li>
+        <li><span data-en="Choose the dates">তারিখ বেছে নিন</span></li>
+        <li><span data-en="Download it as Excel or PDF"><b>Excel</b> বা <b>PDF</b> হিসেবে ডাউনলোড করুন</span></li>
+      </ol>
+      <ol class="fchain">
+        <li><span data-en="If it came by email, open the email and download the file. It is saved in your phone&#x27;s Downloads.">ইমেলে এলে ইমেল খুলে ফাইলটা ডাউনলোড করুন। ফাইল ফোনের <b>Downloads</b>-এ জমা হবে।</span></li>
+        <li><span data-en="In this app, tap the Choose statement file box below">এই অ্যাপে নিচের <b>স্টেটমেন্ট ফাইল বেছে নিন</b> ঘরে চাপুন</span></li>
+        <li><span data-en="Pick the file from Downloads. If it asks for a password, type it and tap Open.">Downloads থেকে ফাইলটা বাছুন। পাসওয়ার্ড চাইলে লিখে <b>খুলুন</b> চাপুন।</span></li>
+        <li class=done><span data-en="Tap Add to my budget. All your UPI payments are in ✅"><b>হিসেবে যোগ করুন</b> চাপুন। সব UPI খরচ বসে গেল ✅</span></li>
+      </ol>
+      <p class="note"><span data-en="No copy-paste needed, you just pick the file. Next month, add the new statement the same way. Payments already added are not added twice.">কোনো কপি-পেস্ট লাগবে না, ফাইলটা শুধু বেছে নিতে হবে। পরের মাসে একই ভাবে নতুন স্টেটমেন্ট দিন, আগের খরচ দ্বিতীয়বার বসবে না।</span></p>
+    </details>
     <label class="file" for="stmt"><span data-en="Choose statement file">স্টেটমেন্ট ফাইল বেছে নিন</span>
       <small><span data-en="Excel, CSV or PDF">Excel, CSV বা PDF</span></small>
       <input id="stmt" type="file" accept=".csv,.xls,.xlsx,.pdf,text/csv,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
@@ -206,13 +242,7 @@ textarea{font:inherit;font-size:.85rem;color:var(--ink);background:var(--bg);bor
     <div id="importMsg" aria-live="polite"></div>
     <div class="preview" id="preview" hidden></div>
     <details class="help">
-      <summary>স্টেটমেন্ট কীভাবে দেবেন? · How to add a statement</summary>
-      <p><strong>১.</strong> PhonePe বা ব্যাঙ্কের অ্যাপ থেকে স্টেটমেন্ট ডাউনলোড করুন। ইমেলে এলে ইমেল খুলে ফাইলটা ডাউনলোড করে নিন। ফাইল ফোনের Downloads-এ জমা হবে।<br><small>Download the statement from PhonePe or your bank app. If it comes by email, open the email and download the file. It is saved in your phone's Downloads.</small></p>
-      <p><strong>২.</strong> এই অ্যাপে উপরের "স্টেটমেন্ট ফাইল বেছে নিন" ঘরে চাপ দিন। ফোনের ফাইলের তালিকা খুলবে।<br><small>Tap the "স্টেটমেন্ট ফাইল বেছে নিন" (Choose statement file) box above. Your phone's file list opens.</small></p>
-      <p><strong>৩.</strong> Downloads থেকে স্টেটমেন্টের ফাইলটা বেছে নিন। পাসওয়ার্ড চাইলে লিখে "খুলুন" চাপুন।<br><small>Pick the statement file from Downloads. If it asks for a password, type it and tap "খুলুন" (Open).</small></p>
-      <p><strong>৪.</strong> অ্যাপ দেখাবে কতগুলো খরচ পাওয়া গেল। "UPI"-তে টিক রেখে "হিসেবে যোগ করুন" চাপুন। ব্যস!<br><small>The app shows how many payments it found. Keep "UPI" ticked and tap "হিসেবে যোগ করুন" (Add to my budget). Done!</small></p>
-      <p><strong>পরের মাসে</strong> নতুন স্টেটমেন্ট দিলে আগের খরচগুলো দ্বিতীয়বার যোগ হবে না, শুধু নতুনগুলো ঢুকবে।<br><small>Next month, add the new statement the same way. Payments already added are skipped automatically.</small></p>
-      <h3><span data-en="A few more notes">আরও কিছু কথা</span></h3>
+      <summary><span data-en="More about statements">স্টেটমেন্ট নিয়ে আরও কিছু কথা</span></summary>
       <p><span data-en="Download the Account Statement from net banking or your bank app. Excel or CSV works most accurately. PDF also works, but every bank lays out its PDF differently, so a few lines may be missed.">ব্যাঙ্কের নেট ব্যাঙ্কিং বা ব্যাঙ্কের অ্যাপ থেকে Account Statement ডাউনলোড করুন। Excel বা CSV হলে সবচেয়ে নির্ভুল কাজ করে। PDF-ও চলে, তবে সব ব্যাঙ্কের PDF-এর ছাঁচ আলাদা, তাই কিছু লাইন বাদ পড়তে পারে।</span></p>
       <p><span data-en="You can also add a PhonePe statement (PDF). If it needs a password, a box appears above.">PhonePe-র স্টেটমেন্টও (PDF) দিতে পারেন। পাসওয়ার্ড চাইলে উপরে ঘর আসবে।</span></p>
       <p><span data-en="The file is read only on your phone and is never sent anywhere.">ফাইলটা শুধু আপনার ফোনেই পড়া হয়, কোথাও পাঠানো হয় না।</span></p>
@@ -937,6 +967,12 @@ $("impDel").onclick=()=>{$("impDelAsk").hidden=false};
 $("impDelNo").onclick=()=>{$("impDelAsk").hidden=true};
 $("impDelYes").onclick=()=>{S.exp=S.exp.filter(e=>e.src!=="imp");save();$("impDelAsk").hidden=true;
   render()};
+/* ---------- statement how-to flowchart ---------- */
+document.querySelectorAll("#howFlow [data-src]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("#howFlow [data-src]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+  $("fc-pp").hidden=b.dataset.src!=="pp";$("fc-bank").hidden=b.dataset.src!=="bank";});
+$("howFlow").open=!S.exp.some(e=>e.src==="imp")||S.sample;
+
 /* ---------- language ---------- */
 const APP_URL="https://pappa6.github.io/ajker-khoroch/";
 function shareText(){return T("আজকের খরচ অ্যাপ: রোজ জানুন আজ কত টাকা নিশ্চিন্তে খরচ করা যায়। লগইন নেই, সব তথ্য শুধু আপনার ফোনে।","Ajker Khoroch app: know every day how much you can safely spend today. No login, all your data stays on your phone.");}
