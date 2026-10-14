@@ -147,6 +147,11 @@ li.payee select{flex:0 1 46%;font-size:.85rem;padding:6px 8px}
 .fchain:last-of-type li:last-child::after{display:none}
 .sharetip{background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
 .sharetip p{margin:0;font-size:.93rem}
+.installtop{background:var(--accent);color:var(--card);font-weight:600}
+.installhelp{background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.installhelp .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.installhelp ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px}
+.installhelp li{display:list-item;border:0;padding:0}
 textarea{font:inherit;font-size:.85rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%;min-height:90px;resize:vertical}
 @media (prefers-reduced-motion:reduce){.meter span{transition:none}}
 </style>
@@ -160,8 +165,19 @@ textarea{font:inherit;font-size:.85rem;color:var(--ink);background:var(--bg);bor
     <span class="date" id="today"></span>
     <button class="helpbtn" id="obOpen"><span data-en="How to use">কীভাবে ব্যবহার করবেন?</span></button>
     <a class="helpbtn sharebtn" id="shareApp" href="https://wa.me/?text=%E0%A6%86%E0%A6%9C%E0%A6%95%E0%A7%87%E0%A6%B0%20%E0%A6%96%E0%A6%B0%E0%A6%9A%20%E0%A6%85%E0%A7%8D%E0%A6%AF%E0%A6%BE%E0%A6%AA%3A%20%E0%A6%B0%E0%A7%8B%E0%A6%9C%20%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A7%81%E0%A6%A8%20%E0%A6%86%E0%A6%9C%20%E0%A6%95%E0%A6%A4%20%E0%A6%9F%E0%A6%BE%E0%A6%95%E0%A6%BE%20%E0%A6%A8%E0%A6%BF%E0%A6%B6%E0%A7%8D%E0%A6%9A%E0%A6%BF%E0%A6%A8%E0%A7%8D%E0%A6%A4%E0%A7%87%20%E0%A6%96%E0%A6%B0%E0%A6%9A%20%E0%A6%95%E0%A6%B0%E0%A6%BE%20%E0%A6%AF%E0%A6%BE%E0%A6%AF%E0%A6%BC%E0%A5%A4%20%E0%A6%B2%E0%A6%97%E0%A6%87%E0%A6%A8%20%E0%A6%A8%E0%A7%87%E0%A6%87%2C%20%E0%A6%B8%E0%A6%AC%20%E0%A6%A4%E0%A6%A5%E0%A7%8D%E0%A6%AF%20%E0%A6%B6%E0%A7%81%E0%A6%A7%E0%A7%81%20%E0%A6%86%E0%A6%AA%E0%A6%A8%E0%A6%BE%E0%A6%B0%20%E0%A6%AB%E0%A7%8B%E0%A6%A8%E0%A7%87%E0%A5%A4%20https%3A%2F%2Fpappa6.github.io%2Fajker-khoroch%2F" target="_blank" rel="noopener"><span data-en="Share with a friend">বন্ধুকে পাঠান</span></a>
+    <button class="helpbtn installtop" id="installTop" hidden><span data-en="📲 Install on phone">📲 ফোনে বসান</span></button>
     <button class="helpbtn" id="langBtn" aria-label="ভাষা / Language">English</button>
   </header>
+
+  <div class="installhelp" id="installHelp" hidden>
+    <div class="top"><strong><span data-en="To install the app">অ্যাপটা ফোনে বসাতে</span></strong><button class="x" id="installHelpClose" aria-label="Close">✕</button></div>
+    <ol>
+      <li><span data-en="Tap ⋮ (three dots) at the top right of Chrome">Chrome-এর উপরে ডানদিকে <b>⋮</b> (তিনটে ফোঁটা) চাপুন</span></li>
+      <li><span data-en="Tap Install app or Add to Home screen"><b>Install app</b> বা <b>Add to Home screen</b> চাপুন</span></li>
+      <li><span data-en="Tap Install. The আজ ₹ icon appears on your home screen ✅"><b>Install</b> চাপুন। হোম স্ক্রিনে <b>আজ ₹</b> আইকন বসে যাবে ✅</span></li>
+    </ol>
+    <p class="note"><span data-en="On iPhone: in Safari tap the Share icon → Add to Home Screen.">iPhone-এ: Safari-তে নিচের Share চিহ্ন → <b>Add to Home Screen</b>।</span></p>
+  </div>
 
   <section class="onb" id="onboard" hidden>
     <div class="top">
@@ -990,11 +1006,18 @@ const ON_SITE=location.hostname.endsWith("github.io");
 $("shareTip").hidden=!ON_SITE;
 if(ON_SITE&&"serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}
 let deferredInstall=null;
-const isInstalled=()=>window.matchMedia("(display-mode: standalone)").matches;
+const isInstalled=()=>window.matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
 if(isInstalled()) $("installHint").hidden=true;
+$("installTop").hidden=!ON_SITE||isInstalled();
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;$("installBtn").hidden=false;$("installHint").hidden=true;});
-$("installBtn").onclick=async()=>{if(!deferredInstall)return;deferredInstall.prompt();try{await deferredInstall.userChoice}catch(_){};deferredInstall=null;$("installBtn").hidden=true;};
-window.addEventListener("appinstalled",()=>{$("installBtn").hidden=true;$("installHint").hidden=true;});
+async function doInstall(){
+  if(deferredInstall){deferredInstall.prompt();try{await deferredInstall.userChoice}catch(_){};deferredInstall=null;$("installBtn").hidden=true;}
+  else{$("installHelp").hidden=false;$("installHelp").scrollIntoView({behavior:"smooth",block:"start"});}
+}
+$("installBtn").onclick=doInstall;
+$("installTop").onclick=doInstall;
+$("installHelpClose").onclick=()=>{$("installHelp").hidden=true};
+window.addEventListener("appinstalled",()=>{["installBtn","installHint","installTop","installHelp"].forEach(id=>$(id).hidden=true);});
 async function takeShared(){
   if(!/[?&]shared=1/.test(location.search)||!("caches" in window))return;
   history.replaceState(null,"",location.pathname);
